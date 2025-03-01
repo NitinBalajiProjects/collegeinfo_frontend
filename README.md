@@ -1,0 +1,1 @@
+# collegeinfo_frontend

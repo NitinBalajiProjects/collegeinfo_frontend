@@ -1,9 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Flask App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sortable College Rankings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Hello, Flask!</h1>
+<body class="bg-gray-100 text-gray-900">
+
+    <div class="container mx-auto p-8">
+        <h1 class="text-3xl font-bold text-center mb-6">Top Colleges in the U.S.</h1>
+
+        <div class="overflow-x-auto">
+            <table id="collegeTable" class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-blue-500 text-white">
+                    <tr>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(0)">Rank ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(1)">College Name ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(2)">City ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(3)">State ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(4)">Tuition Fees ($) ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(5)">In-State Fees ($) ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(6)">Enrollment ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(7)">SAT Range ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(8)">ACT Range ⬍</th>
+                        <th class="py-3 px-4 cursor-pointer" onclick="sortTable(9)">Reputation ⬍</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for college in cs_colleges %}
+                    <tr class="hover:bg-gray-100">
+                        <td class="py-3 px-4">{{ college['Rank'] }}</td>
+                        <td class="py-3 px-4 font-semibold">{{ college['College Name'] }}</td>
+                        <td class="py-3 px-4">{{ college['City'] }}</td>
+                        <td class="py-3 px-4">{{ college['State'] }}</td>
+                        <td class="py-3 px-4">{{ college['Tuition Fees'] | default('N/A', true) }}</td>
+                        <td class="py-3 px-4">{{ college['In-State Fees'] | default('N/A', true) }}</td>
+                        <td class="py-3 px-4">{{ college['Undergraduate Enrollment'] }}</td>
+                        <td class="py-3 px-4">
+                            {% if college['Min SAT'] and college['Max SAT'] %}
+                                {{ college['Min SAT'] }} - {{ college['Max SAT'] }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if college['Min ACT'] and college['Max ACT'] %}
+                                {{ college['Min ACT'] }} - {{ college['Max ACT'] }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">{{ college['Reputation Score'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function sortTable(columnIndex) {
+            const table = document.getElementById("collegeTable");
+            const tbody = table.getElementsByTagName("tbody")[0];
+            const rows = Array.from(tbody.getElementsByTagName("tr"));
+
+            const ascending = table.getAttribute("data-sort") === "asc" ? false : true;
+            table.setAttribute("data-sort", ascending ? "asc" : "desc");
+
+            rows.sort((rowA, rowB) => {
+                const cellA = rowA.getElementsByTagName("td")[columnIndex].innerText.trim();
+                const cellB = rowB.getElementsByTagName("td")[columnIndex].innerText.trim();
+
+                const numA = parseFloat(cellA.replace(/[^0-9.-]+/g, ""));
+                const numB = parseFloat(cellB.replace(/[^0-9.-]+/g, ""));
+                
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return ascending ? numA - numB : numB - numA;
+                } else {
+                    return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                }
+            });
+
+            tbody.innerHTML = "";
+            rows.forEach(row => tbody.appendChild(row));
+        }
+    </script>
+
 </body>
 </html>

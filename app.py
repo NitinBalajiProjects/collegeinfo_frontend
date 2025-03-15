@@ -21,7 +21,8 @@ def index():
     # Parse JSON Responses
     colleges = response.json() if response.status_code == 200 else []
 
-    return render_template('index.html', cs_colleges=colleges, ranking_type=ranking_type)
+    states = sorted(set(college['State'] for college in cs_colleges))
+    return render_template('index.html', cs_colleges=colleges, ranking_type=ranking_type, states=states)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

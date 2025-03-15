@@ -17,7 +17,10 @@ def index():
     cs_colleges = cs_response.json() if cs_response.status_code == 200 else []
     national_colleges = national_response.json() if national_response.status_code == 200 else []
 
-    return render_template('index.html', cs_colleges=cs_colleges, national_colleges=national_colleges)
+    # Extract unique states
+    states = sorted(set(college['State'] for college in cs_colleges))
+
+    return render_template('index.html', cs_colleges=cs_colleges, national_colleges=national_colleges, states=states)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
